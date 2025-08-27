@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2em;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        .section {
+            padding: 1em;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>API Tester</h1>
+    <div class="container">
+        <div class="section">
+            <h2>GET All</h2>
+            <button onclick="getTodos()">Get</button>
+            <pre id="get-all-response"></pre>
+        </div>
+        <div class="section">
+            <h2>GET One</h2>
+            <input type="text" id="get-id" placeholder="ID">
+            <button onclick="getOneTodo()">Get</button>
+            <pre id="get-one-response"></pre>
+        </div>
+        <div class="section">
+            <h2>POST</h2>
+            <input type="text" id="post-title" placeholder="Title">
+            <button onclick="postTodo()">Post</button>
+            <pre id="post-response"></pre>
+        </div>
+        <div class="section">
+            <h2>PUT</h2>
+            <input type="text" id="put-id" placeholder="ID">
+            <input type="text" id="put-title" placeholder="New Title">
+            <button onclick="putTodo()">Put</button>
+            <pre id="put-response"></pre>
+        </div>
+        <div class="section">
+            <h2>DELETE</h2>
+            <input type="text" id="delete-id" placeholder="ID">
+            <button onclick="deleteTodo()">Delete</button>
+            <pre id="delete-response"></pre>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+
+        async function getTodos() {
+            const res = await fetch(`${API_BASE_URL}/todos`);
+            const data = await res.json();
+            document.getElementById('get-all-response').textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function getOneTodo() {
+            const id = document.getElementById('get-id').value;
+            const res = await fetch(`${API_BASE_URL}/todos/todo/${id}`);
+            const data = await res.json();
+            document.getElementById('get-one-response').textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function postTodo() {
+            const title = document.getElementById('post-title').value;
+            const res = await fetch(`${API_BASE_URL}/todos/create`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title })
+            });
+            const data = await res.json();
+            document.getElementById('post-response').textContent = JSON.stringify(data, null, 2);
+            getTodos();
+        }
+
+        async function putTodo() {
+            const id = document.getElementById('put-id').value;
+            const title = document.getElementById('put-title').value;
+            const res = await fetch(`${API_BASE_URL}/todos/update/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title })
+            });
+            const data = await res.json();
+            document.getElementById('put-response').textContent = JSON.stringify(data, null, 2);
+            getTodos();
+        }
+
+        async function deleteTodo() {
+            const id = document.getElementById('delete-id').value;
+            const res = await fetch(`${API_BASE_URL}/todos/delete/${id}`, { method: 'DELETE' });
+            document.getElementById('delete-response').textContent = `Status: ${res.status}`;
+            getTodos();
+        }
+    </script>
+</body>
+
+</html>
